@@ -762,7 +762,7 @@ Output: solo il testo finale del report, pronto per essere inserito in PDF.
 
   async function callOpenAI(prompt){
     const key = $("openaiKey").value.trim();
-    const model = $("openaiModel").value.trim() || "gpt-4o-mini";
+    const model = "gpt-4.1-mini";
     if(!key){
       throw new Error("Inserisci la OpenAI API Key per usare l’AI.");
     }
@@ -906,4 +906,5 @@ Output: solo il testo finale del report, pronto per essere inserito in PDF.
 })();
 </script>
 </body>
+
 </html>
