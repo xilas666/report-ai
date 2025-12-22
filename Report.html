@@ -760,25 +760,28 @@ Output: solo il testo finale del report, pronto per essere inserito in PDF.
 `.trim();
   }
 
-  async function callOpenAI(prompt){
-    const key = $("openaiKey").value.trim();
-    const model = "gpt-4.1-mini";
-    if(!key){
-      throw new Error("Inserisci la OpenAI API Key per usare l’AI.");
-    }
+  async function callOpenAI(prompt) {
+const res = await fetch(
+"https://report-ai-backend.xhacker.workers.dev/",
+{
+method: "POST",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
+model: "gpt-4.1-mini",
+input: prompt
+})
+}
+);
 
-    // Calls Responses API
-    const res = await fetch(" https://urlsand.esvalabs.com/?u=https%3A%2F%2Fapi.openai.com%2Fv1%2Fresponses&e=a39aa7eb&h=bfb7c44c&f=y&p=y ", {
-      method: "POST",
-      headers: {
-        "Content-Type":"application/json",
-        "Authorization": "Bearer " + key
-      },
-      body: JSON.stringify({
-        model,
-        input: prompt
-      })
-    });
+if (!res.ok) {
+const t = await res.text();
+throw new Error(t || "Errore AI");
+}
+
+return await res.text();
+}
 
     if(!res.ok){
       const t = await res.text();
@@ -908,3 +911,4 @@ Output: solo il testo finale del report, pronto per essere inserito in PDF.
 </body>
 
 </html>
+
