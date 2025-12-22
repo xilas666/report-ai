@@ -1,0 +1,909 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>Report</title>
+  <style>
+    :root{
+      --bg:#0b0c10;
+      --card:#14161d;
+      --text:#eef2ff;
+      --muted:#aab2c5;
+      --accent:#4f8cff;
+      --danger:#ff4f4f;
+      --ok:#39d98a;
+      --border:#2a2f3a;
+      --chip:#1b2030;
+      --shadow: 0 10px 24px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: -apple-system, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 20% -10%, rgba(79,140,255,.25), transparent 60%),
+                  radial-gradient(900px 500px at 100% 0%, rgba(57,217,138,.18), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 40px;
+    }
+    header{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter: blur(10px);
+      background: rgba(11,12,16,.65);
+      border-bottom:1px solid rgba(42,47,58,.6);
+      padding: 16px 16px 12px;
+    }
+    header h1{
+      margin:0;
+      font-size: 20px;
+      letter-spacing: .2px;
+    }
+    header .sub{
+      margin-top:4px;
+      color:var(--muted);
+      font-size: 12px;
+    }
+    main{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 16px;
+      display:grid;
+      gap: 14px;
+    }
+    .card{
+      background: rgba(20,22,29,.92);
+      border: 1px solid rgba(42,47,58,.9);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+    .row{
+      display:grid;
+      gap:12px;
+    }
+    @media(min-width: 860px){
+      .row.cols-2{ grid-template-columns: 1fr 1fr; }
+      .row.cols-3{ grid-template-columns: 1fr 1fr 1fr; }
+    }
+    label{
+      display:block;
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 0 6px;
+    }
+    input, select, textarea{
+      width:100%;
+      background: rgba(11,12,16,.55);
+      color: var(--text);
+      border: 1px solid rgba(42,47,58,.9);
+      border-radius: 12px;
+      padding: 12px 12px;
+      outline: none;
+      font-size: 15px;
+    }
+    textarea{ min-height: 120px; resize: vertical; }
+    input[type="date"]{ padding: 10px 12px; }
+    .hint{
+      margin-top:6px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+    .btnbar{
+      display:flex;
+      gap:10px;
+      flex-wrap: wrap;
+    }
+    button{
+      border:0;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-weight: 650;
+      cursor:pointer;
+      font-size: 15px;
+    }
+    .btn{
+      background: linear-gradient(135deg, rgba(79,140,255,.95), rgba(79,140,255,.65));
+      color:white;
+    }
+    .btn.secondary{
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      border: 1px solid rgba(42,47,58,.9);
+    }
+    .btn.danger{
+      background: rgba(255,79,79,.14);
+      color: #ffd1d1;
+      border:1px solid rgba(255,79,79,.35);
+    }
+    .btn.ok{
+      background: rgba(57,217,138,.14);
+      color: #caffea;
+      border:1px solid rgba(57,217,138,.35);
+    }
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      background: rgba(27,32,48,.9);
+      border:1px solid rgba(42,47,58,.9);
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .photos{
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+      gap:10px;
+      margin-top:10px;
+    }
+    .ph{
+      position:relative;
+      border-radius: 14px;
+      overflow:hidden;
+      border:1px solid rgba(42,47,58,.9);
+      background: rgba(11,12,16,.55);
+      aspect-ratio: 1 / 1;
+    }
+    .ph img{
+      width:100%; height:100%;
+      object-fit: cover;
+      display:block;
+    }
+    .ph button{
+      position:absolute;
+      right:6px; top:6px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: rgba(0,0,0,.45);
+      color: #fff;
+      font-size: 12px;
+    }
+    .split{
+      display:grid;
+      gap:12px;
+    }
+    @media(min-width: 980px){
+      .split{ grid-template-columns: 1fr 1fr; align-items:start; }
+    }
+    .mono{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    footer{
+      text-align:center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 14px 16px;
+    }
+
+    /* --- Stampa (PDF) --- */
+    @media print{
+      body{ background:#fff; color:#000; }
+      header, .no-print{ display:none !important; }
+      main{ padding:0; max-width:none; }
+      .card{ box-shadow:none; border:0; border-radius:0; background:#fff; padding:0; }
+      .print-wrap{ padding: 18mm 14mm; }
+      .print-title{ font-size:20px; font-weight:800; margin:0 0 4mm; }
+      .print-sub{ font-size:12px; margin:0 0 6mm; color:#333; }
+      .print-grid{
+        width:100%;
+        border-collapse: collapse;
+        margin: 0 0 6mm;
+        font-size: 12px;
+      }
+      .print-grid td{
+        border: 1px solid #ddd;
+        padding: 2.5mm 2.8mm;
+        vertical-align: top;
+      }
+      .print-h2{
+        margin: 0 0 2mm;
+        font-size: 14px;
+        font-weight: 800;
+      }
+      .print-text{
+        white-space: pre-wrap;
+        font-size: 12px;
+        line-height: 1.35;
+        margin: 0 0 6mm;
+      }
+      .print-photos{
+        display:grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2.5mm;
+      }
+      .print-photos img{
+        width:100%;
+        height: 45mm;
+        object-fit: cover;
+        border: 1px solid #ddd;
+      }
+      .print-footer{
+        margin-top: 8mm;
+        font-size: 11px;
+        color:#333;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Report</h1>
+    <div class="sub">Developed by Di Via Michele</div>
+  </header>
+
+  <main>
+    <section class="card no-print">
+      <div class="row cols-3">
+        <div>
+          <label>Tipo Report</label>
+          <select id="tipoReport">
+            <option value="nc">Sopralluogo / NC</option>
+            <option value="test">Test Prodotti</option>
+          </select>
+          <div class="hint">Selezionando “Test Prodotti” comparirà la sezione dedicata agli articoli da testare e verrà nascosta “NC eseguita”.</div>
+        </div>
+
+        <div>
+          <label>Data (auto)</label>
+          <input id="dataSopralluogo" type="date" />
+          <div class="hint">Impostata automaticamente su oggi, modificabile.</div>
+        </div>
+
+        <div>
+          <label>Cliente</label>
+          <input id="cliente" placeholder="Es. Azienda Rossi S.r.l." />
+        </div>
+      </div>
+
+      <div class="row cols-2" style="margin-top:12px;">
+        <div>
+          <label>Presenti di Gruppo</label>
+          <input id="presentiGruppo" placeholder="Es. Mario Bianchi, Luca Verdi" />
+        </div>
+        <div>
+          <label>Presenti Cliente</label>
+          <input id="presentiCliente" placeholder="Es. Ing. Neri, Sig. Blu" />
+        </div>
+      </div>
+
+      <div class="row cols-2" style="margin-top:12px;">
+        <div>
+          <label>Località del test</label>
+          <input id="localitaTest" placeholder="Es. Milano, via ..." />
+        </div>
+        <div id="wrapArticolo">
+          <label>Articolo</label>
+          <input id="articolo" placeholder="Es. Articolo / commessa / riferimento" />
+        </div>
+      </div>
+
+      <!-- Sezione NC -->
+      <div id="sezioneNC" class="row cols-3" style="margin-top:12px;">
+        <div>
+          <label>NC eseguita</label>
+          <select id="ncEseguita">
+            <option value="">—</option>
+            <option value="Sì">Sì</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+        <div>
+          <label>Lotti contestati</label>
+          <input id="lottiContestati" placeholder="Es. L1, L2, L3" />
+        </div>
+        <div>
+          <label>Lotti testati</label>
+          <input id="lottiTestati" placeholder="Es. L4, L5" />
+        </div>
+      </div>
+
+      <!-- Sezione Test Prodotti -->
+      <div id="sezioneTest" class="card" style="margin-top:12px; padding:12px; display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+          <div>
+            <div style="font-weight:800;">Test Prodotti</div>
+            <div class="hint">Inserisci il nome degli articoli che andrai a testare dal cliente. (Lista)</div>
+          </div>
+          <button class="btn ok" id="btnAddTest">+ Aggiungi articolo</button>
+        </div>
+
+        <div id="testList" style="margin-top:10px; display:grid; gap:10px;"></div>
+
+        <template id="testRowTpl">
+          <div class="card" style="padding:10px; border-radius:14px;">
+            <div class="row cols-3">
+              <div>
+                <label>Nome articolo (test)</label>
+                <input class="t_nome" placeholder="Es. Valvola Y / Guarnizione 25mm" />
+              </div>
+              <div>
+                <label>Codice / Lotto (opz.)</label>
+                <input class="t_lotto" placeholder="Es. L123 / Cod. 9981" />
+              </div>
+              <div>
+                <label>Esito (opz.)</label>
+                <select class="t_esito">
+                  <option value="">—</option>
+                  <option value="OK">OK</option>
+                  <option value="KO">KO</option>
+                  <option value="In attesa">In attesa</option>
+                </select>
+              </div>
+            </div>
+            <div style="margin-top:10px;">
+              <label>Note (opz.)</label>
+              <input class="t_note" placeholder="Nota rapida" />
+            </div>
+            <div style="margin-top:10px; display:flex; justify-content:flex-end;">
+              <button class="btn danger t_remove">Rimuovi</button>
+            </div>
+          </div>
+        </template>
+      </div>
+    </section>
+
+    <section class="card no-print">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+        <div>
+          <div style="font-weight:800;">Foto</div>
+          <div class="hint">Scatta o carica foto (multi). Su iPhone spesso apre direttamente la camera.</div>
+        </div>
+        <div class="btnbar">
+          <label class="chip" style="cursor:pointer;">
+            📷 Aggiungi foto
+            <input id="fotoInput" type="file" accept="image/*" capture="environment" multiple style="display:none;" />
+          </label>
+          <button class="btn danger" id="btnClearPhotos">Svuota foto</button>
+        </div>
+      </div>
+      <div id="photos" class="photos"></div>
+    </section>
+
+    <section class="card no-print split">
+      <div>
+        <div style="font-weight:800;">Report grezzo</div>
+        <div class="hint">Scrivi anche “male”: l’AI lo renderà professionale.</div>
+        <textarea id="reportGrezzo" placeholder="Scrivi qui..."></textarea>
+
+        <div style="margin-top:12px;">
+          <div style="font-weight:800;">AI (opzionale)</div>
+          <div class="hint">
+            Per usare “Sistema con AI” qui in solo-HTML devi inserire una OpenAI API Key.
+            <span style="color:#ffd1d1;">Attenzione:</span> la key resta nel browser/dispositivo.
+          </div>
+          <input id="openaiKey" class="mono" type="password" placeholder="Incolla qui la tua OpenAI API Key (sk-...)" />
+          <div class="row cols-2" style="margin-top:10px;">
+            <div>
+              <label>Modello (lascia così se non sai)</label>
+              <input id="openaiModel" class="mono" value="gpt-4o-mini" />
+            </div>
+            <div>
+              <label>Lingua output</label>
+              <select id="linguaOut">
+                <option value="it">Italiano</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="btnbar" style="margin-top:12px;">
+            <button class="btn" id="btnAI">✨ Sistema con AI</button>
+            <button class="btn secondary" id="btnCopyPro">Copia report professionale</button>
+            <button class="btn secondary" id="btnSave">Salva (locale)</button>
+            <button class="btn danger" id="btnReset">Azzera tutto</button>
+          </div>
+
+          <div id="aiStatus" class="hint" style="margin-top:10px;"></div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-weight:800;">Report professionale</div>
+        <div class="hint">Puoi anche modificarlo manualmente prima di esportare PDF.</div>
+        <textarea id="reportPro" placeholder="Qui comparirà il testo professionale..."></textarea>
+
+        <div class="btnbar" style="margin-top:12px;">
+          <button class="btn ok" id="btnPDF">🧾 Esporta PDF</button>
+          <button class="btn secondary" id="btnPreview">Anteprima stampa</button>
+        </div>
+
+        <div class="hint" style="margin-top:10px;">
+          Su iPhone: dopo “Esporta PDF” si aprirà la schermata di stampa → condividi → “Salva su File” (PDF).
+        </div>
+      </div>
+    </section>
+
+    <!-- Area stampabile -->
+    <section class="card print-wrap" id="printArea" aria-hidden="true" style="display:none;">
+      <div class="print-title">Report</div>
+      <div class="print-sub">Developed by Di Via Michele</div>
+
+      <table class="print-grid" id="printTable"></table>
+
+      <div class="print-h2">Report</div>
+      <div class="print-text" id="printText"></div>
+
+      <div id="printPhotosWrap" style="display:none;">
+        <div class="print-h2">Foto</div>
+        <div class="print-photos" id="printPhotos"></div>
+      </div>
+
+      <div class="print-footer">Generato tramite Web App “Report”.</div>
+    </section>
+
+    <footer class="no-print">Developed by Di Via Michele</footer>
+  </main>
+
+<script>
+(function(){
+  const $ = (id)=>document.getElementById(id);
+
+  const state = {
+    photos: [], // array di dataURL
+    tests: []   // array di {nome, lotto, esito, note}
+  };
+
+  // --- Init data auto ---
+  const todayISO = new Date();
+  const pad = (n)=> String(n).padStart(2,'0');
+  const isoDate = `${todayISO.getFullYear()}-${pad(todayISO.getMonth()+1)}-${pad(todayISO.getDate())}`;
+  $("dataSopralluogo").value = isoDate;
+
+  // --- Tipo report toggle ---
+  function applyTipo(){
+    const tipo = $("tipoReport").value;
+    const isTest = (tipo === "test");
+    $("sezioneNC").style.display = isTest ? "none" : "grid";
+    $("sezioneTest").style.display = isTest ? "block" : "none";
+    // In modalità Test spesso "Articolo" non è unico: lo lasciamo visibile ma non obbligatorio.
+    $("wrapArticolo").style.opacity = isTest ? "0.85" : "1";
+  }
+  $("tipoReport").addEventListener("change", applyTipo);
+  applyTipo();
+
+  // --- Foto handling ---
+  function renderPhotos(){
+    const wrap = $("photos");
+    wrap.innerHTML = "";
+    state.photos.forEach((src, idx)=>{
+      const d = document.createElement("div");
+      d.className = "ph";
+      d.innerHTML = `<img alt="foto ${idx+1}" src="${src}"><button title="Rimuovi">✕</button>`;
+      d.querySelector("button").addEventListener("click", ()=>{
+        state.photos.splice(idx,1);
+        renderPhotos();
+      });
+      wrap.appendChild(d);
+    });
+  }
+
+  async function fileToDataURL(file){
+    return new Promise((resolve,reject)=>{
+      const reader = new FileReader();
+      reader.onload = ()=> resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  $("fotoInput").addEventListener("change", async (e)=>{
+    const files = Array.from(e.target.files || []);
+    for (const f of files){
+      // piccola compressione "soft" via canvas per non esplodere (iPhone foto enormi)
+      const dataURL = await fileToDataURL(f);
+      const compressed = await compressImage(dataURL, 1600, 0.82);
+      state.photos.push(compressed);
+    }
+    e.target.value = "";
+    renderPhotos();
+  });
+
+  $("btnClearPhotos").addEventListener("click", ()=>{
+    if(confirm("Vuoi rimuovere tutte le foto?")){
+      state.photos = [];
+      renderPhotos();
+    }
+  });
+
+  async function compressImage(dataURL, maxSide=1600, quality=0.82){
+    return new Promise((resolve)=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const w = img.width, h = img.height;
+        const scale = Math.min(1, maxSide / Math.max(w,h));
+        const nw = Math.round(w*scale), nh = Math.round(h*scale);
+        const canvas = document.createElement("canvas");
+        canvas.width = nw; canvas.height = nh;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, nw, nh);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = ()=> resolve(dataURL);
+      img.src = dataURL;
+    });
+  }
+
+  // --- Test Prodotti list ---
+  function addTestRow(prefill){
+    const tpl = $("testRowTpl");
+    const node = tpl.content.cloneNode(true);
+    const row = node.querySelector(".card");
+
+    const nome = row.querySelector(".t_nome");
+    const lotto = row.querySelector(".t_lotto");
+    const esito = row.querySelector(".t_esito");
+    const note = row.querySelector(".t_note");
+
+    if(prefill){
+      nome.value = prefill.nome || "";
+      lotto.value = prefill.lotto || "";
+      esito.value = prefill.esito || "";
+      note.value = prefill.note || "";
+    }
+
+    row.querySelector(".t_remove").addEventListener("click", ()=>{
+      row.remove();
+      syncTestsFromUI();
+    });
+
+    [nome, lotto, esito, note].forEach(el => el.addEventListener("input", syncTestsFromUI));
+    [esito].forEach(el => el.addEventListener("change", syncTestsFromUI));
+
+    $("testList").appendChild(node);
+    syncTestsFromUI();
+  }
+
+  function syncTestsFromUI(){
+    const rows = Array.from($("testList").querySelectorAll(".card"));
+    state.tests = rows.map(r => ({
+      nome: r.querySelector(".t_nome").value.trim(),
+      lotto: r.querySelector(".t_lotto").value.trim(),
+      esito: r.querySelector(".t_esito").value.trim(),
+      note: r.querySelector(".t_note").value.trim()
+    })).filter(x => x.nome.length>0 || x.lotto.length>0 || x.esito.length>0 || x.note.length>0);
+  }
+
+  $("btnAddTest").addEventListener("click", ()=> addTestRow());
+  // pre-carica una riga vuota quando si passa in modalità test (comodo)
+  $("tipoReport").addEventListener("change", ()=>{
+    if($("tipoReport").value==="test" && $("testList").children.length===0){
+      addTestRow();
+    }
+  });
+
+  // --- Save/Load local ---
+  const STORAGE_KEY = "report_app_v1";
+  function getFormData(){
+    syncTestsFromUI();
+    return {
+      tipoReport: $("tipoReport").value,
+      dataSopralluogo: $("dataSopralluogo").value,
+      articolo: $("articolo").value,
+      cliente: $("cliente").value,
+      presentiGruppo: $("presentiGruppo").value,
+      presentiCliente: $("presentiCliente").value,
+      localitaTest: $("localitaTest").value,
+      ncEseguita: $("ncEseguita").value,
+      lottiContestati: $("lottiContestati").value,
+      lottiTestati: $("lottiTestati").value,
+      tests: state.tests,
+      reportGrezzo: $("reportGrezzo").value,
+      reportPro: $("reportPro").value,
+      photos: state.photos
+    };
+  }
+
+  function setFormData(d){
+    $("tipoReport").value = d.tipoReport || "nc";
+    applyTipo();
+    $("dataSopralluogo").value = d.dataSopralluogo || isoDate;
+    $("articolo").value = d.articolo || "";
+    $("cliente").value = d.cliente || "";
+    $("presentiGruppo").value = d.presentiGruppo || "";
+    $("presentiCliente").value = d.presentiCliente || "";
+    $("localitaTest").value = d.localitaTest || "";
+    $("ncEseguita").value = d.ncEseguita || "";
+    $("lottiContestati").value = d.lottiContestati || "";
+    $("lottiTestati").value = d.lottiTestati || "";
+    $("reportGrezzo").value = d.reportGrezzo || "";
+    $("reportPro").value = d.reportPro || "";
+
+    state.photos = Array.isArray(d.photos) ? d.photos : [];
+    renderPhotos();
+
+    // tests
+    $("testList").innerHTML = "";
+    const tests = Array.isArray(d.tests) ? d.tests : [];
+    if(tests.length){
+      tests.forEach(t => addTestRow(t));
+    } else {
+      state.tests = [];
+      if($("tipoReport").value==="test"){
+        addTestRow();
+      }
+    }
+  }
+
+  function saveLocal(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(getFormData()));
+      status("Salvato in locale ✅");
+    }catch(e){
+      status("Salvataggio fallito (memoria piena?). Prova a rimuovere foto o usare meno dati.", true);
+    }
+  }
+
+  function loadLocal(){
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return;
+    try{
+      setFormData(JSON.parse(raw));
+      status("Caricato da locale ✅");
+    }catch(e){}
+  }
+
+  $("btnSave").addEventListener("click", saveLocal);
+  loadLocal();
+
+  $("btnReset").addEventListener("click", ()=>{
+    if(confirm("Azzera tutto? (anche foto e testi)")){
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
+    }
+  });
+
+  // autosave leggero
+  ["input","change"].forEach(ev=>{
+    document.addEventListener(ev, (e)=>{
+      // evita salvare ad ogni click su bottoni
+      if(e.target && (e.target.tagName==="INPUT" || e.target.tagName==="TEXTAREA" || e.target.tagName==="SELECT")){
+        // salva con un debounce
+        clearTimeout(window.__autosave);
+        window.__autosave = setTimeout(()=> {
+          try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(getFormData())); }catch(_){}
+        }, 350);
+      }
+    }, true);
+  });
+
+  // --- Copy professional text ---
+  $("btnCopyPro").addEventListener("click", async ()=>{
+    const txt = $("reportPro").value || "";
+    if(!txt.trim()){ status("Niente da copiare.", true); return; }
+    try{
+      await navigator.clipboard.writeText(txt);
+      status("Copiato ✅");
+    }catch(e){
+      // fallback
+      $("reportPro").focus();
+      $("reportPro").select();
+      document.execCommand("copy");
+      status("Copiato ✅");
+    }
+  });
+
+  // --- AI polish ---
+  function buildAIInput(){
+    syncTestsFromUI();
+    const tipo = $("tipoReport").value;
+    const base = {
+      tipoReport: tipo,
+      dataSopralluogo: $("dataSopralluogo").value,
+      articolo: $("articolo").value,
+      cliente: $("cliente").value,
+      presentiGruppo: $("presentiGruppo").value,
+      presentiCliente: $("presentiCliente").value,
+      localitaTest: $("localitaTest").value,
+      reportGrezzo: $("reportGrezzo").value
+    };
+
+    if(tipo === "nc"){
+      base.ncEseguita = $("ncEseguita").value;
+      base.lottiContestati = $("lottiContestati").value;
+      base.lottiTestati = $("lottiTestati").value;
+    } else {
+      base.testProdotti = state.tests;
+    }
+    return base;
+  }
+
+  function makePrompt(data){
+    const tipo = data.tipoReport === "test" ? "Test Prodotti" : "Sopralluogo / NC";
+
+    let bloccoExtra = "";
+    if(data.tipoReport === "nc"){
+      bloccoExtra = `
+- NC eseguita: ${data.ncEseguita || "Dato non specificato"}
+- Lotti contestati: ${data.lottiContestati || "Dato non specificato"}
+- Lotti testati: ${data.lottiTestati || "Dato non specificato"}`.trim();
+    } else {
+      const elenco = (data.testProdotti && data.testProdotti.length)
+        ? data.testProdotti.map((t,i)=> {
+            const parts = [];
+            if(t.nome) parts.push(`Articolo: ${t.nome}`);
+            if(t.lotto) parts.push(`Codice/Lotto: ${t.lotto}`);
+            if(t.esito) parts.push(`Esito: ${t.esito}`);
+            if(t.note) parts.push(`Note: ${t.note}`);
+            return `${i+1}) ${parts.join(" | ")}`;
+          }).join("\n")
+        : "Dato non specificato";
+      bloccoExtra = `TEST PRODOTTI:\n${elenco}`;
+    }
+
+    return `
+Sei un tecnico redattore. Riscrivi in italiano professionale il seguente report.
+Regole:
+- Mantieni ESATTAMENTE i dati forniti, non inventare nulla.
+- Correggi ortografia, lessico e punteggiatura.
+- Rendi il testo chiaro, formale, tecnico.
+- Se un dato manca, scrivi "Dato non specificato" senza aggiungere dettagli.
+- Struttura consigliata: Contesto, Attività svolte, Risultati/Osservazioni, Conclusioni.
+
+TIPO REPORT: ${tipo}
+
+DATI:
+- Data: ${data.dataSopralluogo || "Dato non specificato"}
+- Cliente: ${data.cliente || "Dato non specificato"}
+- Presenti Gruppo: ${data.presentiGruppo || "Dato non specificato"}
+- Presenti Cliente: ${data.presentiCliente || "Dato non specificato"}
+- Località del test: ${data.localitaTest || "Dato non specificato"}
+- Articolo (se applicabile): ${data.articolo || "Dato non specificato"}
+${bloccoExtra}
+
+REPORT GREZZO:
+${data.reportGrezzo || "Dato non specificato"}
+
+Output: solo il testo finale del report, pronto per essere inserito in PDF.
+`.trim();
+  }
+
+  async function callOpenAI(prompt){
+    const key = $("openaiKey").value.trim();
+    const model = $("openaiModel").value.trim() || "gpt-4o-mini";
+    if(!key){
+      throw new Error("Inserisci la OpenAI API Key per usare l’AI.");
+    }
+
+    // Calls Responses API
+    const res = await fetch(" https://urlsand.esvalabs.com/?u=https%3A%2F%2Fapi.openai.com%2Fv1%2Fresponses&e=a39aa7eb&h=bfb7c44c&f=y&p=y ", {
+      method: "POST",
+      headers: {
+        "Content-Type":"application/json",
+        "Authorization": "Bearer " + key
+      },
+      body: JSON.stringify({
+        model,
+        input: prompt
+      })
+    });
+
+    if(!res.ok){
+      const t = await res.text();
+      throw new Error("Errore API ("+res.status+"): " + t);
+    }
+
+    const json = await res.json();
+    // output_text è comodo quando presente, altrimenti estraiamo dal content
+    if(json.output_text) return json.output_text;
+
+    // fallback (più robusto)
+    try{
+      const out = json.output?.[0]?.content?.map(c=>c.text).join("") || "";
+      return out || JSON.stringify(json).slice(0,800);
+    }catch(e){
+      return JSON.stringify(json).slice(0,800);
+    }
+  }
+
+  $("btnAI").addEventListener("click", async ()=>{
+    try{
+      const data = buildAIInput();
+      if(!data.reportGrezzo || !data.reportGrezzo.trim()){
+        status("Scrivi prima qualcosa nel Report grezzo.", true);
+        return;
+      }
+      status("AI in elaborazione…");
+      $("btnAI").disabled = true;
+
+      const prompt = makePrompt(data);
+      const out = await callOpenAI(prompt);
+      $("reportPro").value = (out || "").trim();
+      status("Report sistemato ✅");
+      saveLocal();
+    }catch(e){
+      status(e.message || String(e), true);
+    }finally{
+      $("btnAI").disabled = false;
+    }
+  });
+
+  function status(msg, isErr=false){
+    const el = $("aiStatus");
+    el.textContent = msg;
+    el.style.color = isErr ? "#ffd1d1" : "var(--muted)";
+  }
+
+  // --- Print / PDF ---
+  function buildPrint(){
+    const d = getFormData();
+    const tipoTxt = (d.tipoReport === "test") ? "Test Prodotti" : "Sopralluogo / NC";
+
+    // tabella dati
+    const rows = [];
+    rows.push(["Tipo report", tipoTxt]);
+    rows.push(["Data", d.dataSopralluogo || "Dato non specificato"]);
+    rows.push(["Cliente", d.cliente || "Dato non specificato"]);
+    rows.push(["Presenti Gruppo", d.presentiGruppo || "Dato non specificato"]);
+    rows.push(["Presenti Cliente", d.presentiCliente || "Dato non specificato"]);
+    rows.push(["Località del test", d.localitaTest || "Dato non specificato"]);
+
+    // Articolo: utile in entrambe, se compilato
+    rows.push(["Articolo", d.articolo || "Dato non specificato"]);
+
+    if(d.tipoReport === "nc"){
+      rows.push(["NC eseguita", d.ncEseguita || "Dato non specificato"]);
+      rows.push(["Lotti contestati", d.lottiContestati || "Dato non specificato"]);
+      rows.push(["Lotti testati", d.lottiTestati || "Dato non specificato"]);
+    } else {
+      const elenco = (d.tests && d.tests.length)
+        ? d.tests.map((t,i)=>{
+            const parts = [];
+            if(t.nome) parts.push(t.nome);
+            if(t.lotto) parts.push("("+t.lotto+")");
+            if(t.esito) parts.push("- " + t.esito);
+            if(t.note) parts.push("— " + t.note);
+            return (i+1)+") " + parts.join(" ");
+          }).join("\n")
+        : "Dato non specificato";
+      rows.push(["Test Prodotti", elenco]);
+    }
+
+    const table = $("printTable");
+    table.innerHTML = rows.map(r => `<tr><td style="width:32%; font-weight:700;">${escapeHtml(r[0])}</td><td>${escapeHtml(r[1])}</td></tr>`).join("");
+
+    // testo report
+    const text = (d.reportPro && d.reportPro.trim()) ? d.reportPro : (d.reportGrezzo || "");
+    $("printText").textContent = text || "Dato non specificato";
+
+    // foto
+    const pw = $("printPhotosWrap");
+    const p = $("printPhotos");
+    p.innerHTML = "";
+    if(d.photos && d.photos.length){
+      pw.style.display = "block";
+      d.photos.forEach(src=>{
+        const img = document.createElement("img");
+        img.src = src;
+        p.appendChild(img);
+      });
+    } else {
+      pw.style.display = "none";
+    }
+  }
+
+  function escapeHtml(s){
+    return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
+  }
+
+  $("btnPreview").addEventListener("click", ()=>{
+    buildPrint();
+    $("printArea").style.display = "block";
+    window.print();
+    $("printArea").style.display = "none";
+  });
+
+  $("btnPDF").addEventListener("click", ()=>{
+    // identico a preview: su iPhone la stampa consente di salvare in PDF
+    buildPrint();
+    $("printArea").style.display = "block";
+    window.print();
+    $("printArea").style.display = "none";
+  });
+
+})();
+</script>
+</body>
+</html>
