@@ -766,14 +766,17 @@ const AI_BACKEND_URL = "https://report-ai-worker.xhacker.workers.dev/ai";
 
 async function callAI(prompt){
   const res = await fetch(AI_BACKEND_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      prompt,
-      model: $("aiModel")?.value?.trim() || "gpt-4o-mini",
-      lang: $("aiLang")?.value || "Italiano"
-    })
-  });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "X-App-Token": "XilAs_9fA2kLx_83QmPz_2025_7QvL1n"
+  },
+  body: JSON.stringify({
+    prompt,
+    model: $("aiModel")?.value?.trim() || "gpt-4o-mini",
+    lang: $("aiLang")?.value || "Italiano"
+  })
+});
 
   if(!res.ok){
     const t = await res.text();
@@ -900,5 +903,6 @@ function status(msg, isErr=false){
 </body>
 
 </html>
+
 
 
