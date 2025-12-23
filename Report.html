@@ -181,6 +181,7 @@
 
     /* --- Stampa (PDF) --- */
     @media print{
+      #printArea{ display:block !important; }
       body{ background:#fff; color:#000; }
       header, .no-print{ display:none !important; }
       main{ padding:0; max-width:none; }
@@ -889,11 +890,15 @@ Output: solo il testo finale del report, pronto per essere inserito in PDF.
   }
 
   $("btnPreview").addEventListener("click", ()=>{
-    buildPrint();
-    $("printArea").style.display = "block";
+  buildPrint();
+  const pa = $("printArea");
+  pa.style.display = "block";
+
+  setTimeout(() => {
     window.print();
-    $("printArea").style.display = "none";
-  });
+    pa.style.display = "none";
+  }, 300);
+});
 
   $("btnPDF").addEventListener("click", ()=>{
     // identico a preview: su iPhone la stampa consente di salvare in PDF
@@ -908,3 +913,4 @@ Output: solo il testo finale del report, pronto per essere inserito in PDF.
 </body>
 
 </html>
+
