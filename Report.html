@@ -761,71 +761,58 @@ Output: solo il testo finale del report, pronto per essere inserito in PDF.
 `.trim();
   }
 
-  async function callOpenAI(prompt){
-    const key = $("openaiKey").value.trim();
-    const model = "gpt-4.1-mini";
-    if(!key){
-      throw new Error("Inserisci la OpenAI API Key per usare l’AI.");
-    }
+  // ===== AI via Cloudflare Worker (no API key in browser) =====
+const AI_BACKEND_URL = "https://report-ai-worker.xhacker.workers.dev/ai";
 
-    // Calls Responses API
-    const res = await fetch(" https://urlsand.esvalabs.com/?u=https%3A%2F%2Fapi.openai.com%2Fv1%2Fresponses&e=a39aa7eb&h=bfb7c44c&f=y&p=y ", {
-      method: "POST",
-      headers: {
-        "Content-Type":"application/json",
-        "Authorization": "Bearer " + key
-      },
-      body: JSON.stringify({
-        model,
-        input: prompt
-      })
-    });
-
-    if(!res.ok){
-      const t = await res.text();
-      throw new Error("Errore API ("+res.status+"): " + t);
-    }
-
-    const json = await res.json();
-    // output_text è comodo quando presente, altrimenti estraiamo dal content
-    if(json.output_text) return json.output_text;
-
-    // fallback (più robusto)
-    try{
-      const out = json.output?.[0]?.content?.map(c=>c.text).join("") || "";
-      return out || JSON.stringify(json).slice(0,800);
-    }catch(e){
-      return JSON.stringify(json).slice(0,800);
-    }
-  }
-
-  $("btnAI").addEventListener("click", async ()=>{
-    try{
-      const data = buildAIInput();
-      if(!data.reportGrezzo || !data.reportGrezzo.trim()){
-        status("Scrivi prima qualcosa nel Report grezzo.", true);
-        return;
-      }
-      status("AI in elaborazione…");
-      $("btnAI").disabled = true;
-
-      const prompt = makePrompt(data);
-      const out = await callOpenAI(prompt);
-      $("reportPro").value = (out || "").trim();
-      status("Report sistemato ✅");
-      saveLocal();
-    }catch(e){
-      status(e.message || String(e), true);
-    }finally{
-      $("btnAI").disabled = false;
-    }
+async function callAI(prompt){
+  const res = await fetch(AI_BACKEND_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      prompt,
+      model: $("aiModel")?.value?.trim() || "gpt-4o-mini",
+      lang: $("aiLang")?.value || "Italiano"
+    })
   });
 
-  function status(msg, isErr=false){
-    const el = $("aiStatus");
-    el.textContent = msg;
-    el.style.color = isErr ? "#ffd1d1" : "var(--muted)";
+  if(!res.ok){
+    const t = await res.text();
+    throw new Error("Errore AI ("+res.status+"): " + t);
   }
+
+  const json = await res.json();
+  return (json.text || "").trim();
+}
+
+$("btnAI").addEventListener("click", async ()=>{
+  try{
+    const data = buildAIInput();
+    if(!data.reportGrezzo || !data.reportGrezzo.trim()){
+      status("Scrivi prima qualcosa nel Report grezzo.", true);
+      return;
+    }
+
+    status("AI in elaborazione…");
+    $("btnAI").disabled = true;
+
+    const prompt = makePrompt(data);
+    const out = await callAI(prompt);
+
+    $("reportPro").value = out;
+    status("Report sistemato ✅");
+    saveLocal();
+  }catch(e){
+    status(e.message || String(e), true);
+  }finally{
+    $("btnAI").disabled = false;
+  }
+});
+
+function status(msg, isErr=false){
+  const el = $("aiStatus");
+  el.textContent = msg;
+  el.style.color = isErr ? "#ffd1d1" : "var(--muted)";
+}
 
   // --- Print / PDF ---
   function buildPrint(){
@@ -913,4 +900,5 @@ Output: solo il testo finale del report, pronto per essere inserito in PDF.
 </body>
 
 </html>
+
 
