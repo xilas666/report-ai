@@ -453,6 +453,24 @@
   el.addEventListener(ev, fn);
 };
 document.addEventListener("DOMContentLoaded", () => {
+  // DEBUG: mostra errori JS sullo schermo
+  const __dbg = document.createElement("div");
+  __dbg.id = "jsDebug";
+  __dbg.style.cssText = "position:fixed;left:10px;bottom:10px;z-index:99999;background:#111;color:#0f0;padding:8px 10px;border:1px solid #0f0;border-radius:8px;font:12px monospace;max-width:92vw;white-space:pre-wrap";
+  __dbg.textContent = "JS: avviato ✅";
+  document.body.appendChild(__dbg);
+
+  window.addEventListener("error", (e) => {
+    __dbg.style.color = "#ff4d4d";
+    __dbg.style.borderColor = "#ff4d4d";
+    __dbg.textContent = "JS ERROR ❌\n" + (e.message || e.error || "errore sconosciuto");
+  });
+
+  window.addEventListener("unhandledrejection", (e) => {
+    __dbg.style.color = "#ff4d4d";
+    __dbg.style.borderColor = "#ff4d4d";
+    __dbg.textContent = "PROMISE ERROR ❌\n" + String(e.reason || e);
+  });
   alert("JS partito OK");
   const state = {
     photos: [], // array di dataURL
@@ -958,6 +976,7 @@ if(d.photos && d.photos.length){
 </body>
 
 </html>
+
 
 
 
