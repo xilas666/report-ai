@@ -762,8 +762,8 @@ Output: solo il testo finale del report, pronto per essere inserito in PDF.
   }
 
   // ===== AI via Cloudflare Worker (no API key in browser) =====
-const AI_BACKEND_URL = "https://report-ai-worker.xhacker.workers.dev/ai";
-
+const AI_BACKEND_URL = "https://report-ai-worker-v2.xhacker.workers.dev/ai";
+const LOGIN_URL = "https://report-ai-worker-v2.xhacker.workers.dev/login";
 async function callAI(prompt){
   const res = await fetch(AI_BACKEND_URL, {
   method: "POST",
@@ -903,6 +903,7 @@ function status(msg, isErr=false){
 </body>
 
 </html>
+
 
 
 
