@@ -796,7 +796,7 @@ async function callAI(prompt){
   method: "POST",
   headers: {
   "Content-Type": "application/json",
-  "Authorization": "Bearer " + token
+  "Authorization": "Bearer " + token,
 },
   body: JSON.stringify({
     prompt,
@@ -804,13 +804,13 @@ async function callAI(prompt){
     lang: $("aiLang")?.value || "Italiano"
   })
 });
+const raw = await res.text();
+alert("AI raw: " + raw.slice(0, 200));
+if(!res.ok){
+  throw new Error("Errore AI (" + res.status + "): " + raw);
+}
 
-  if(!res.ok){
-    const t = await res.text();
-    throw new Error("Errore AI ("+res.status+"): " + t);
-  }
-
-  const json = await res.json();
+  const json = JSON.parse(raw);
   return (json.text || "").trim();
 }
 
@@ -931,6 +931,7 @@ function status(msg, isErr=false){
 </body>
 
 </html>
+
 
 
 
