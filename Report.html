@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="utf-8" />
@@ -444,7 +444,7 @@
 <script>
 (function(){
   const $ = (id)=>document.getElementById(id);
-
+document.addEventListener("DOMContentLoaded", () => {
   const state = {
     photos: [], // array di dataURL
     tests: []   // array di {nome, lotto, esito, note}
@@ -943,12 +943,13 @@ if(d.photos && d.photos.length){
     window.print();
     $("printArea").style.display = "none";
   });
-
+});
 })();
 </script>
 </body>
 
 </html>
+
 
 
 
