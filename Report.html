@@ -444,7 +444,16 @@
 <script>
 (function(){
   const $ = (id)=>document.getElementById(id);
+  const on = (id, ev, fn) => {
+  const el = $(id);
+  if (!el) {
+    console.warn("Elemento non trovato:", id);
+    return;
+  }
+  el.addEventListener(ev, fn);
+};
 document.addEventListener("DOMContentLoaded", () => {
+  alert("JS partito OK");
   const state = {
     photos: [], // array di dataURL
     tests: []   // array di {nome, lotto, esito, note}
@@ -949,6 +958,7 @@ if(d.photos && d.photos.length){
 </body>
 
 </html>
+
 
 
 
