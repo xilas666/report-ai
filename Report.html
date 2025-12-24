@@ -805,7 +805,7 @@ async function callAI(prompt){
   })
 });
 const raw = await res.text();
-alert("AI raw: " + raw.slice(0, 200));
+  
 if(!res.ok){
   throw new Error("Errore AI (" + res.status + "): " + raw);
 }
@@ -931,6 +931,7 @@ function status(msg, isErr=false){
 </body>
 
 </html>
+
 
 
 
