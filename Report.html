@@ -811,7 +811,7 @@ if(!res.ok){
 }
 
   const json = JSON.parse(raw);
-  return (json.text || "").trim();
+  return (json.result || "").trim();
 }
 
 $("btnAI").addEventListener("click", async ()=>{
@@ -931,6 +931,7 @@ function status(msg, isErr=false){
 </body>
 
 </html>
+
 
 
 
