@@ -426,7 +426,10 @@
 
       <div class="print-h2">Report</div>
       <div class="print-text" id="printText"></div>
-
+<div id="photosWrap" class="no-print" style="display:none;">
+  <div class="print-h2">Foto</div>
+  <div class="print-photos" id="photos"></div>
+</div>
       <div id="printPhotosWrap" style="display:none;">
         <div class="print-h2">Foto</div>
         <div class="print-photos" id="printPhotos"></div>
@@ -887,21 +890,36 @@ function status(msg, isErr=false){
     const text = (d.reportPro && d.reportPro.trim()) ? d.reportPro : (d.reportGrezzo || "");
     $("printText").textContent = text || "Dato non specificato";
 
-    // foto
-    const pw = $("printPhotosWrap");
-    const p = $("printPhotos");
-    p.innerHTML = "";
-    if(d.photos && d.photos.length){
-      pw.style.display = "block";
-      d.photos.forEach(src=>{
-        const img = document.createElement("img");
-        img.src = src;
-        p.appendChild(img);
-      });
-    } else {
-      pw.style.display = "none";
-    }
-  }
+    // foto (report normale + stampa)
+const pw = $("printPhotosWrap");
+const p = $("printPhotos");
+
+const w = $("photosWrap");
+const q = $("photos");
+
+p.innerHTML = "";
+q.innerHTML = "";
+
+if(d.photos && d.photos.length){
+  // mostra nel report
+  w.style.display = "block";
+  d.photos.forEach(src=>{
+    const img = document.createElement("img");
+    img.src = src;
+    q.appendChild(img);
+  });
+
+  // mostra nella stampa / PDF
+  pw.style.display = "block";
+  d.photos.forEach(src=>{
+    const img = document.createElement("img");
+    img.src = src;
+    p.appendChild(img);
+  });
+} else {
+  w.style.display = "none";
+  pw.style.display = "none";
+}
 
   function escapeHtml(s){
     return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
@@ -931,6 +949,7 @@ function status(msg, isErr=false){
 </body>
 
 </html>
+
 
 
 
