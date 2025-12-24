@@ -820,7 +820,7 @@ if(!res.ok){
 document.addEventListener("DOMContentLoaded", () => {
   const btn = document.getElementById("btnAI");
   if (!btn) {
-    alert("ERRORE: bottone AI non trovato");
+    alert("ERRORE: btnAI non trovato");
     return;
   }
 
@@ -848,31 +848,8 @@ document.addEventListener("DOMContentLoaded", () => {
     } finally {
       btn.disabled = false;
     }
-  });
+  };
 });
-
-function status(msg, isErr=false){
-  const el = $("aiStatus");
-  el.textContent = msg;
-  el.style.color = isErr ? "#ffd1d1" : "var(--muted)";
-}
-
-  // --- Print / PDF ---
-  function buildPrint(){
-    const d = getFormData();
-    const tipoTxt = (d.tipoReport === "test") ? "Test Prodotti" : "Sopralluogo / NC";
-
-    // tabella dati
-    const rows = [];
-    rows.push(["Tipo report", tipoTxt]);
-    rows.push(["Data", d.dataSopralluogo || "Dato non specificato"]);
-    rows.push(["Cliente", d.cliente || "Dato non specificato"]);
-    rows.push(["Presenti Gruppo", d.presentiGruppo || "Dato non specificato"]);
-    rows.push(["Presenti Cliente", d.presentiCliente || "Dato non specificato"]);
-    rows.push(["Località del test", d.localitaTest || "Dato non specificato"]);
-
-    // Articolo: utile in entrambe, se compilato
-    rows.push(["Articolo", d.articolo || "Dato non specificato"]);
 
     if(d.tipoReport === "nc"){
       rows.push(["NC eseguita", d.ncEseguita || "Dato non specificato"]);
@@ -958,6 +935,7 @@ if(d.photos && d.photos.length){
 </body>
 
 </html>
+
 
 
 
