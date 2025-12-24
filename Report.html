@@ -817,31 +817,38 @@ if(!res.ok){
   return (json.result || "").trim();
 }
 
-window.addEventListener("load", () => {
-  $("btnAI").addEventListener("click", async ()=>{
-  try{
-    await ensureAISession();
-    const data = buildAIInput();
-    if(!data.reportGrezzo || !data.reportGrezzo.trim()){
-      status("Scrivi prima qualcosa nel Report grezzo.", true);
-      return;
-    }
-
-    status("AI in elaborazione…");
-    $("btnAI").disabled = true;
-
-    const prompt = makePrompt(data);
-    const out = await callAI(prompt);
-
-    $("reportPro").value = out;
-    status("Report sistemato ✅");
-    saveLocal();
-  }catch(e){
-    status(e.message || String(e), true);
-  }finally{
-    $("btnAI").disabled = false;
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("btnAI");
+  if (!btn) {
+    alert("ERRORE: bottone AI non trovato");
+    return;
   }
-});
+
+  btn.addEventListener("click", async () => {
+    try {
+      await ensureAISession();
+
+      const data = buildAIInput();
+      if (!data.reportGrezzo || !data.reportGrezzo.trim()) {
+        status("Scrivi prima qualcosa nel Report grezzo.", true);
+        return;
+      }
+
+      status("AI in elaborazione…");
+      btn.disabled = true;
+
+      const prompt = makePrompt(data);
+      const out = await callAI(prompt);
+
+      document.getElementById("reportPro").value = out;
+      status("Report sistemato ✅");
+      saveLocal();
+    } catch (e) {
+      status(e?.message || String(e), true);
+    } finally {
+      btn.disabled = false;
+    }
+  });
 });
 
 function status(msg, isErr=false){
@@ -951,6 +958,7 @@ if(d.photos && d.photos.length){
 </body>
 
 </html>
+
 
 
 
