@@ -818,6 +818,7 @@ if(!res.ok){
 }
 
 $("btnAI").addEventListener("click", async ()=>{
+  alert("CLICK AI OK");
   try{
     await ensureAISession();
     const data = buildAIInput();
@@ -949,6 +950,7 @@ if(d.photos && d.photos.length){
 </body>
 
 </html>
+
 
 
 
