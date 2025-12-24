@@ -817,8 +817,8 @@ if(!res.ok){
   return (json.result || "").trim();
 }
 
-$("btnAI").addEventListener("click", async ()=>{
-  alert("CLICK AI OK");
+window.addEventListener("load", () => {
+  $("btnAI").addEventListener("click", async ()=>{
   try{
     await ensureAISession();
     const data = buildAIInput();
@@ -841,6 +841,7 @@ $("btnAI").addEventListener("click", async ()=>{
   }finally{
     $("btnAI").disabled = false;
   }
+});
 });
 
 function status(msg, isErr=false){
@@ -950,6 +951,7 @@ if(d.photos && d.photos.length){
 </body>
 
 </html>
+
 
 
 
