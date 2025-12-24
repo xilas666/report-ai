@@ -764,13 +764,40 @@ Output: solo il testo finale del report, pronto per essere inserito in PDF.
   // ===== AI via Cloudflare Worker (no API key in browser) =====
 const AI_BACKEND_URL = "https://report-ai-worker-v2.xhacker.workers.dev/ai";
 const LOGIN_URL = "https://report-ai-worker-v2.xhacker.workers.dev/login";
+  async function ensureAISession(){
+  const existing = localStorage.getItem("ai_session_token");
+  const exp = Number(localStorage.getItem("ai_session_exp") || "0");
+  if (existing && exp && Date.now() < exp) return existing;
+
+  const pin = prompt("Inserisci PIN per usare l’AI:");
+  if(!pin) throw new Error("PIN mancante.");
+
+  const res = await fetch(LOGIN_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ pin })
+  });
+
+  if(!res.ok){
+    const t = await res.text();
+    throw new Error("Login fallito ("+res.status+"): " + t);
+  }
+
+  const json = await res.json();
+  if(!json.token || !json.exp) throw new Error("Risposta login non valida.");
+
+  localStorage.setItem("ai_session_token", json.token);
+  localStorage.setItem("ai_session_exp", String(json.exp));
+  return json.token;
+}
 async function callAI(prompt){
+  const token = await ensureAISession();
   const res = await fetch(AI_BACKEND_URL, {
   method: "POST",
   headers: {
-    "Content-Type": "application/json",
-    "X-App-Token": "XilAs_9fA2kLx_83QmPz_2025_7QvL1n"
-  },
+  "Content-Type": "application/json",
+  "Authorization": "Bearer " + token
+},
   body: JSON.stringify({
     prompt,
     model: $("aiModel")?.value?.trim() || "gpt-4o-mini",
@@ -789,6 +816,7 @@ async function callAI(prompt){
 
 $("btnAI").addEventListener("click", async ()=>{
   try{
+    await ensureAISession();
     const data = buildAIInput();
     if(!data.reportGrezzo || !data.reportGrezzo.trim()){
       status("Scrivi prima qualcosa nel Report grezzo.", true);
@@ -903,6 +931,7 @@ function status(msg, isErr=false){
 </body>
 
 </html>
+
 
 
 
