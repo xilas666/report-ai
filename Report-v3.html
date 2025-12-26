@@ -1,1 +1,205 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Report AI – V3</title>
 
+<style>
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto;
+  background:#0b0c10;
+  color:#eaeaea;
+}
+main{
+  max-width:900px;
+  margin:auto;
+  padding:16px;
+}
+.card{
+  background:#14161d;
+  border-radius:12px;
+  padding:16px;
+  margin-bottom:16px;
+}
+h1,h2{
+  margin-top:0;
+}
+textarea,input,select,button{
+  width:100%;
+  margin-top:8px;
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  font-size:15px;
+}
+textarea{min-height:120px}
+button{
+  background:#3b82f6;
+  color:white;
+  font-weight:600;
+}
+button.secondary{
+  background:#2a2d36;
+}
+.btnbar{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:12px;
+}
+#photos{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.ph{
+  position:relative;
+}
+.ph img{
+  width:90px;
+  height:90px;
+  object-fit:cover;
+  border-radius:8px;
+}
+.ph button{
+  position:absolute;
+  top:2px;
+  right:2px;
+  width:auto;
+  padding:2px 6px;
+  font-size:12px;
+  background:#ef4444;
+}
+#printArea{
+  display:none;
+  background:white;
+  color:black;
+  padding:24px;
+}
+@media print{
+  body *{visibility:hidden}
+  #printArea,#printArea *{visibility:visible}
+  #printArea{position:absolute;left:0;top:0;width:100%}
+}
+</style>
+</head>
+
+<body>
+<main>
+
+<div class="card">
+<h1>Report AI – V3</h1>
+<label>Report grezzo</label>
+<textarea id="reportRaw" placeholder="Scrivi qui il report iniziale..."></textarea>
+
+<div class="btnbar">
+<button id="btnAI">✨ Genera con AI</button>
+<button class="secondary" id="btnSave">💾 Salva</button>
+</div>
+</div>
+
+<div class="card">
+<h2>Report professionale</h2>
+<textarea id="reportPro" placeholder="Qui comparirà il report finale..."></textarea>
+
+<div class="btnbar">
+<button id="btnPDF">📄 Esporta PDF</button>
+<button class="secondary" id="btnPreview">👁 Anteprima</button>
+</div>
+</div>
+
+<div class="card">
+<h2>Foto</h2>
+<input type="file" id="photoInput" accept="image/*" multiple>
+<div id="photos"></div>
+</div>
+
+</main>
+
+<div id="printArea"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+
+const $=id=>document.getElementById(id);
+const state={photos:[]};
+
+/* FOTO */
+$("photoInput").addEventListener("change",e=>{
+  [...e.target.files].forEach(f=>{
+    const r=new FileReader();
+    r.onload=()=>{state.photos.push(r.result);renderPhotos();}
+    r.readAsDataURL(f);
+  });
+});
+
+function renderPhotos(){
+  const w=$("photos"); w.innerHTML="";
+  state.photos.forEach((src,i)=>{
+    const d=document.createElement("div");
+    d.className="ph";
+    d.innerHTML=`<img src="${src}"><button>X</button>`;
+    d.querySelector("button").onclick=()=>{
+      state.photos.splice(i,1); renderPhotos();
+    };
+    w.appendChild(d);
+  });
+}
+
+/* AI (placeholder backend) */
+$("btnAI").addEventListener("click",async()=>{
+  if(!$("reportRaw").value.trim()){
+    alert("Scrivi prima il report grezzo");
+    return;
+  }
+  $("btnAI").disabled=true;
+  $("btnAI").textContent="AI in elaborazione...";
+  try{
+    // SIMULAZIONE: qui puoi collegare Cloudflare Worker
+    await new Promise(r=>setTimeout(r,1200));
+    $("reportPro").value =
+      "REPORT PROFESSIONALE\n\n" + $("reportRaw").value;
+  }finally{
+    $("btnAI").disabled=false;
+    $("btnAI").textContent="✨ Genera con AI";
+  }
+});
+
+/* SALVA */
+$("btnSave").addEventListener("click",()=>{
+  localStorage.setItem("reportPro",$("reportPro").value);
+  alert("Salvato in locale");
+});
+$("reportPro").value=localStorage.getItem("reportPro")||"";
+
+/* PRINT */
+function buildPrint(){
+  const p=$("printArea");
+  p.innerHTML=
+    `<h1>Report</h1><pre>${$("reportPro").value}</pre>`+
+    state.photos.map(s=>`<img src="${s}" style="width:200px;margin:6px">`).join("");
+}
+
+$("btnPreview").addEventListener("click",()=>{
+  buildPrint();
+  $("printArea").style.display="block";
+  setTimeout(()=>{
+    window.print();
+    $("printArea").style.display="none";
+  },300);
+});
+
+$("btnPDF").addEventListener("click",()=>{
+  buildPrint();
+  $("printArea").style.display="block";
+  window.print();
+  $("printArea").style.display="none";
+});
+
+});
+</script>
+
+</body>
+</html>
